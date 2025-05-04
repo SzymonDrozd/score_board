@@ -2,6 +2,7 @@ package model;
 
 
 import exception.IncorrectGameValueException;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,15 +12,19 @@ import java.util.Optional;
 
 @Setter
 @Getter
-public class Game {
+public class Game implements Comparable<Game> {
 
     private String homeTeam;
-    private int homeTeamScore;
+    @Setter(AccessLevel.NONE)
+    private volatile int homeTeamScore;
 
     private String awayTeam;
-    private int awayTeamScore;
+    @Setter(AccessLevel.NONE)
+    private volatile int awayTeamScore;
 
+    @Setter(AccessLevel.NONE)
     private LocalDateTime startDateTime;
+    @Setter(AccessLevel.NONE)
     private LocalDateTime stopDateTime;
 
     public Game() {
@@ -32,7 +37,7 @@ public class Game {
                 throw new IncorrectGameValueException("Home Team score value is out of range. Value: " + value);
             }
 
-            setHomeTeamScore(value);
+            this.homeTeamScore = value;
         });
 
         Optional.ofNullable(newAwayTeamScore).ifPresent(value -> {
@@ -40,7 +45,7 @@ public class Game {
                 throw new IncorrectGameValueException("Away Team score value is out of range. Value: " + value);
             }
 
-            setAwayTeamScore(value);
+            this.awayTeamScore = value;
         });
     }
 
@@ -51,5 +56,21 @@ public class Game {
         game.setAwayTeam(awayTeam);
 
         return game;
+    }
+
+    @Override
+    public int compareTo(Game o) {
+        int sumOfPoints = this.homeTeamScore + this.awayTeamScore;
+        int sumOfComparedPoints = o.getHomeTeamScore() + o.getAwayTeamScore();
+
+        if(sumOfPoints < sumOfComparedPoints) {
+            return 1;
+        }
+
+        if(sumOfPoints == sumOfComparedPoints) {
+            return this.startDateTime.compareTo(o.startDateTime);
+        }
+
+        return -1;
     }
 }
