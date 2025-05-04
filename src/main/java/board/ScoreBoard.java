@@ -1,6 +1,7 @@
 package board;
 
 import exception.DuplicateGameException;
+import exception.IncorrectGameValueException;
 import model.Game;
 
 import java.util.Collections;
@@ -31,14 +32,34 @@ public class ScoreBoard {
         games.put(key, game);
     }
 
-    public void updateScore(String homeTeam, String awayTeam, Integer newHomeTeamScore, Integer newAwayTeamScore) {
+    public void updateScoreByTeams(String homeTeam, String awayTeam, Integer newHomeTeamScore, Integer newAwayTeamScore) {
         updateScoreByKey(getGameKey(homeTeam, awayTeam), newHomeTeamScore, newAwayTeamScore);
     }
 
     public void updateScoreByKey(String key, Integer newHomeTeamScore, Integer newAwayTeamScore) {
         Optional.ofNullable(findGameByKey(key))
-                .ifPresent(game -> game.updateScore(newHomeTeamScore, newAwayTeamScore));
+                .ifPresent(game -> updateScore(game, newHomeTeamScore, newAwayTeamScore));
 
+    }
+
+    private void updateScore(Game game, Integer newHomeTeamScore, Integer newAwayTeamScore) {
+        synchronized (game) {
+            Optional.ofNullable(newHomeTeamScore).ifPresent(value -> {
+                if(value < 0) {
+                    throw new IncorrectGameValueException("Home Team score value is out of range. Value: " + value);
+                }
+
+                game.setHomeTeamScore(value);
+            });
+
+            Optional.ofNullable(newAwayTeamScore).ifPresent(value -> {
+                if(value < 0) {
+                    throw new IncorrectGameValueException("Away Team score value is out of range. Value: " + value);
+                }
+
+                game.setAwayTeamScore(value);
+            });
+        }
     }
 
     public String summary() {

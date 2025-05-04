@@ -42,33 +42,33 @@ class ScoreBoardTest {
     }
 
     @Test
-    public void testUpdateScoreGameNotFound() {
-        assertThrows(NoSuchElementException.class, () -> scoreBoard.updateScore("Test1", "Test2", 1, 1));
+    public void testUpdateScoreByTeamsGameNotFound() {
+        assertThrows(NoSuchElementException.class, () -> scoreBoard.updateScoreByTeams("Test1", "Test2", 1, 1));
     }
 
     @Test
-    public void testUpdateScoreInvalidValue() {
+    public void testUpdateScoreByTeamsInvalidValue() {
         scoreBoard.startGame("Test1", "Test2");
 
-        assertThrows(IncorrectGameValueException.class, () -> scoreBoard.updateScore("Test1", "Test2", -1, 1));
+        assertThrows(IncorrectGameValueException.class, () -> scoreBoard.updateScoreByTeams("Test1", "Test2", -1, 1));
     }
 
     @Test
-    public void testUpdateScore() {
+    public void testUpdateScoreByTeams() {
         scoreBoard.startGame("Test1", "Test2");
-        scoreBoard.updateScore("Test1", "Test2", 1, 1);
+        scoreBoard.updateScoreByTeams("Test1", "Test2", 1, 1);
 
         Game game = scoreBoard.findGameByTeams("Test1", "Test2");
 
         assertEquals(1, game.getHomeTeamScore());
         assertEquals(1, game.getAwayTeamScore());
 
-        scoreBoard.updateScore("Test1", "Test2", 2, 0);
+        scoreBoard.updateScoreByTeams("Test1", "Test2", 2, 0);
 
         assertEquals(2, game.getHomeTeamScore());
         assertEquals(0, game.getAwayTeamScore());
 
-        scoreBoard.updateScore("Test1", "Test2", null, 3);
+        scoreBoard.updateScoreByTeams("Test1", "Test2", null, 3);
 
         assertEquals(2, game.getHomeTeamScore());
         assertEquals(3, game.getAwayTeamScore());
@@ -77,19 +77,19 @@ class ScoreBoardTest {
     @Test
     public void testSummary() {
         scoreBoard.startGame("Mexico", "Canada");
-        scoreBoard.updateScore("Mexico", "Canada", 0, 5);
+        scoreBoard.updateScoreByTeams("Mexico", "Canada", 0, 5);
 
         scoreBoard.startGame("Spain", "Brazil");
-        scoreBoard.updateScore("Spain", "Brazil", 10, 2);
+        scoreBoard.updateScoreByTeams("Spain", "Brazil", 10, 2);
 
         scoreBoard.startGame("Germany", "France");
-        scoreBoard.updateScore("Germany", "France", 2, 2);
+        scoreBoard.updateScoreByTeams("Germany", "France", 2, 2);
 
         scoreBoard.startGame("Uruguay", "Italy");
-        scoreBoard.updateScore("Uruguay", "Italy", 6, 6);
+        scoreBoard.updateScoreByTeams("Uruguay", "Italy", 6, 6);
 
         scoreBoard.startGame("Argentina", "Australia");
-        scoreBoard.updateScore("Argentina", "Australia", 3, 1);
+        scoreBoard.updateScoreByTeams("Argentina", "Australia", 3, 1);
 
         assertEquals("""
                 Uruguay 6 - Italy 6
@@ -103,19 +103,19 @@ class ScoreBoardTest {
     @Test
     public void testSummaryMultiThreading() {
         scoreBoard.startGame("Mexico", "Canada");
-        scoreBoard.updateScore("Mexico", "Canada", 0, 5);
+        scoreBoard.updateScoreByTeams("Mexico", "Canada", 0, 5);
 
         scoreBoard.startGame("Spain", "Brazil");
-        scoreBoard.updateScore("Spain", "Brazil", 10, 2);
+        scoreBoard.updateScoreByTeams("Spain", "Brazil", 10, 2);
 
         scoreBoard.startGame("Germany", "France");
-        scoreBoard.updateScore("Germany", "France", 2, 2);
+        scoreBoard.updateScoreByTeams("Germany", "France", 2, 2);
 
         scoreBoard.startGame("Uruguay", "Italy");
-        scoreBoard.updateScore("Uruguay", "Italy", 6, 6);
+        scoreBoard.updateScoreByTeams("Uruguay", "Italy", 6, 6);
 
         scoreBoard.startGame("Argentina", "Australia");
-        scoreBoard.updateScore("Argentina", "Australia", 3, 1);
+        scoreBoard.updateScoreByTeams("Argentina", "Australia", 3, 1);
 
         Runnable task1 = () -> {
             System.out.println("First task");
@@ -130,7 +130,7 @@ class ScoreBoardTest {
 
         Runnable task2 = () -> {
             System.out.println("Second task");
-            scoreBoard.updateScore("Uruguay", "Italy", 0, 0);
+            scoreBoard.updateScoreByTeams("Uruguay", "Italy", 0, 0);
         };
 
         try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
