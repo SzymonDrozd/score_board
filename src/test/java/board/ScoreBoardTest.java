@@ -131,6 +131,10 @@ class ScoreBoardTest {
         Runnable task2 = () -> {
             System.out.println("Second task");
             scoreBoard.updateScoreByTeams("Uruguay", "Italy", 0, 0);
+            Game game = scoreBoard.findGameByTeams("Uruguay", "Italy");
+
+            assertEquals(0, game.getHomeTeamScore());
+            assertEquals(0, game.getAwayTeamScore());
         };
 
         try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
