@@ -3,6 +3,7 @@ package board;
 import exception.DuplicateGameException;
 import exception.IncorrectGameValueException;
 import game.Game;
+import game.keygenerator.GameKeyGenerator;
 import game.summary.SummaryBuilder;
 
 import java.time.LocalDateTime;
@@ -11,19 +12,21 @@ import java.util.*;
 public class ScoreBoard {
 
     private final SummaryBuilder summaryBuilder;
+    private final GameKeyGenerator gameKeyGenerator;
 
     private final Map<String, Game> activeGames;
     private final List<Game> finishedGames;
 
-    public ScoreBoard(SummaryBuilder summaryBuilder) {
+    public ScoreBoard(SummaryBuilder summaryBuilder, GameKeyGenerator gameKeyGenerator) {
         this.summaryBuilder = summaryBuilder;
+        this.gameKeyGenerator = gameKeyGenerator;
 
         activeGames = Collections.synchronizedMap(new HashMap<>());
         finishedGames = new ArrayList<>();
     }
 
     public void startGame(String homeTeam, String awayTeam) {
-        String key = getGameKey(homeTeam, awayTeam);
+        String key = gameKeyGenerator.generateKey(homeTeam, awayTeam);
 
         Optional.ofNullable(activeGames.get(key)).ifPresent(value -> {
             throw new DuplicateGameException("Game already exists. Key: " + value);
@@ -38,7 +41,7 @@ public class ScoreBoard {
     }
 
     public void updateScoreByTeams(String homeTeam, String awayTeam, Integer newHomeTeamScore, Integer newAwayTeamScore) {
-        updateScoreByKey(getGameKey(homeTeam, awayTeam), newHomeTeamScore, newAwayTeamScore);
+        updateScoreByKey(gameKeyGenerator.generateKey(homeTeam, awayTeam), newHomeTeamScore, newAwayTeamScore);
     }
 
     public void updateScoreByKey(String key, Integer newHomeTeamScore, Integer newAwayTeamScore) {
@@ -78,7 +81,7 @@ public class ScoreBoard {
     }
 
     public void finishGameByTeams(String homeTeam, String awayTeam) {
-        String key = getGameKey(homeTeam, awayTeam);
+        String key = gameKeyGenerator.generateKey(homeTeam, awayTeam);
         Game game = Optional.ofNullable(findGameByKey(key)).orElseThrow();
 
         synchronized (game) {
@@ -89,16 +92,12 @@ public class ScoreBoard {
     }
 
     public Game findGameByTeams(String homeTeam, String awayTeam) {
-        return findGameByKey(getGameKey(homeTeam, awayTeam));
+        return findGameByKey(gameKeyGenerator.generateKey(homeTeam, awayTeam));
     }
 
     public Game findGameByKey(String key) {
         synchronized (activeGames) {
             return Optional.ofNullable(activeGames.get(key)).orElseThrow();
         }
-    }
-
-    public String getGameKey(String homeTeam, String awayTeam) {
-        return "$" + homeTeam + "+" + awayTeam;
     }
 }
