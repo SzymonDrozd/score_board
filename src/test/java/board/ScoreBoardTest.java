@@ -143,4 +143,71 @@ class ScoreBoardTest {
         }
 
     }
+
+    @Test
+    public void testFinishGameException() {
+        assertThrows(NoSuchElementException.class, () -> scoreBoard.finishGameByTeams("Test1", "Test2"));
+    }
+
+    @Test
+    public void testFinishGame() {
+        scoreBoard.startGame("Test1", "Test2");
+
+        Game game = scoreBoard.findGameByTeams("Test1", "Test2");
+        assertNull(game.getStopDateTime());
+
+        scoreBoard.finishGameByTeams("Test1", "Test2");
+        assertNotNull(game.getStopDateTime());
+
+        assertThrows(NoSuchElementException.class, () -> scoreBoard.findGameByTeams("Test1", "Test2"));
+    }
+
+    @Test
+    public void testFinishGameMultiThreading() {
+        scoreBoard.startGame("Mexico", "Canada");
+        scoreBoard.updateScoreByTeams("Mexico", "Canada", 0, 5);
+
+        scoreBoard.startGame("Spain", "Brazil");
+        scoreBoard.updateScoreByTeams("Spain", "Brazil", 10, 2);
+
+        scoreBoard.startGame("Germany", "France");
+        scoreBoard.updateScoreByTeams("Germany", "France", 2, 2);
+
+        scoreBoard.startGame("Uruguay", "Italy");
+        scoreBoard.updateScoreByTeams("Uruguay", "Italy", 6, 6);
+
+        scoreBoard.startGame("Argentina", "Australia");
+        scoreBoard.updateScoreByTeams("Argentina", "Australia", 3, 1);
+
+        Runnable task1 = () -> {
+            System.out.println("First task");
+            assertEquals("""
+                Uruguay 6 - Italy 6
+                Spain 10 - Brazil 2
+                Mexico 0 - Canada 5
+                Argentina 3 - Australia 1
+                Germany 2 - France 2
+                """, scoreBoard.summary());
+        };
+
+        Runnable task2 = () -> {
+            System.out.println("Second task");
+            scoreBoard.finishGameByTeams("Uruguay", "Italy");
+
+            assertThrows(NoSuchElementException.class, () -> scoreBoard.findGameByTeams("Uruguay", "Italy"));
+
+            assertEquals("""
+                Spain 10 - Brazil 2
+                Mexico 0 - Canada 5
+                Argentina 3 - Australia 1
+                Germany 2 - France 2
+                """, scoreBoard.summary());
+        };
+
+        try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
+            executorService.execute(task1);
+            executorService.execute(task2);
+        }
+
+    }
 }

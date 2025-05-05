@@ -4,23 +4,23 @@ import exception.DuplicateGameException;
 import exception.IncorrectGameValueException;
 import model.Game;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class ScoreBoard {
 
-    private final Map<String, Game> games;
+    private final Map<String, Game> activeGames;
+    private final List<Game> finishedGames;
 
     public ScoreBoard() {
-        games = Collections.synchronizedMap(new HashMap<>());
+        activeGames = Collections.synchronizedMap(new HashMap<>());
+        finishedGames = new ArrayList<>();
     }
 
     public void startGame(String homeTeam, String awayTeam) {
         String key = getGameKey(homeTeam, awayTeam);
 
-        Optional.ofNullable(games.get(key)).ifPresent(value -> {
+        Optional.ofNullable(activeGames.get(key)).ifPresent(value -> {
             throw new DuplicateGameException("Game already exists. Key: " + value);
         });
 
@@ -29,7 +29,7 @@ public class ScoreBoard {
                 .awayTeam(awayTeam)
                 .build();
 
-        games.put(key, game);
+        activeGames.put(key, game);
     }
 
     public void updateScoreByTeams(String homeTeam, String awayTeam, Integer newHomeTeamScore, Integer newAwayTeamScore) {
@@ -63,9 +63,9 @@ public class ScoreBoard {
     }
 
     public String summary() {
-        synchronized (games) {
+        synchronized (activeGames) {
             StringBuffer stringBuffer = new StringBuffer();
-            games.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEachOrdered(game -> stringBuffer
+            activeGames.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEachOrdered(game -> stringBuffer
                     .append(game.getValue().getHomeTeam())
                     .append(" ")
                     .append(game.getValue().getHomeTeamScore())
@@ -79,13 +79,24 @@ public class ScoreBoard {
         }
     }
 
+    public void finishGameByTeams(String homeTeam, String awayTeam) {
+        String key = getGameKey(homeTeam, awayTeam);
+        Game game = Optional.ofNullable(findGameByKey(key)).orElseThrow();
+
+        synchronized (game) {
+            game.setStopDateTime(LocalDateTime.now());
+            activeGames.remove(key);
+            finishedGames.add(game);
+        }
+    }
+
     public Game findGameByTeams(String homeTeam, String awayTeam) {
         return findGameByKey(getGameKey(homeTeam, awayTeam));
     }
 
     public Game findGameByKey(String key) {
-        synchronized (games) {
-            return Optional.ofNullable(games.get(key)).orElseThrow();
+        synchronized (activeGames) {
+            return Optional.ofNullable(activeGames.get(key)).orElseThrow();
         }
     }
 

@@ -18,9 +18,7 @@ public class Game implements Comparable<Game> {
     private String awayTeam;
     private volatile int awayTeamScore;
 
-    @Setter(AccessLevel.NONE)
     private LocalDateTime startDateTime;
-    @Setter(AccessLevel.NONE)
     private LocalDateTime stopDateTime;
 
     public Game() {
