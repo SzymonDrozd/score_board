@@ -76,7 +76,7 @@ class ScoreBoardTest {
     }
 
     @Test
-    public void testSummary() {
+    public void testSummaryOfActiveGames() {
         scoreBoard.startGame("Mexico", "Canada");
         scoreBoard.updateScoreByTeams("Mexico", "Canada", 0, 5);
 
@@ -98,11 +98,11 @@ class ScoreBoardTest {
                 Mexico 0 - Canada 5
                 Argentina 3 - Australia 1
                 Germany 2 - France 2
-                """, scoreBoard.summary());
+                """, scoreBoard.summaryOfActiveGames());
     }
 
     @Test
-    public void testSummaryMultiThreading() {
+    public void testSummaryOfActiveGamesMultiThreading() {
         scoreBoard.startGame("Mexico", "Canada");
         scoreBoard.updateScoreByTeams("Mexico", "Canada", 0, 5);
 
@@ -126,7 +126,7 @@ class ScoreBoardTest {
                     Mexico 0 - Canada 5
                     Argentina 3 - Australia 1
                     Germany 2 - France 2
-                    """, scoreBoard.summary());
+                    """, scoreBoard.summaryOfActiveGames());
         };
 
         Runnable task2 = () -> {
@@ -188,7 +188,7 @@ class ScoreBoardTest {
                     Mexico 0 - Canada 5
                     Argentina 3 - Australia 1
                     Germany 2 - France 2
-                    """, scoreBoard.summary());
+                    """, scoreBoard.summaryOfActiveGames());
         };
 
         Runnable task2 = () -> {
@@ -202,13 +202,38 @@ class ScoreBoardTest {
                     Mexico 0 - Canada 5
                     Argentina 3 - Australia 1
                     Germany 2 - France 2
-                    """, scoreBoard.summary());
+                    """, scoreBoard.summaryOfActiveGames());
         };
 
         try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
             executorService.execute(task1);
             executorService.execute(task2);
         }
+    }
+
+    @Test
+    public void testFinishedGamesSummaryOfActiveGames() {
+        scoreBoard.startGame("Mexico", "Canada");
+        scoreBoard.updateScoreByTeams("Mexico", "Canada", 0, 5);
+        scoreBoard.finishGameByTeams("Mexico", "Canada");
+
+        scoreBoard.startGame("Spain", "Brazil");
+        scoreBoard.updateScoreByTeams("Spain", "Brazil", 10, 2);
+
+        scoreBoard.startGame("Germany", "France");
+        scoreBoard.updateScoreByTeams("Germany", "France", 2, 2);
+        scoreBoard.finishGameByTeams("Germany", "France");
+
+        scoreBoard.startGame("Uruguay", "Italy");
+        scoreBoard.updateScoreByTeams("Uruguay", "Italy", 6, 6);
+
+        scoreBoard.startGame("Argentina", "Australia");
+        scoreBoard.updateScoreByTeams("Argentina", "Australia", 3, 1);
+
+        assertEquals("""
+                    Mexico 0 - Canada 5
+                    Germany 2 - France 2
+                    """, scoreBoard.summaryOfFinishedGames());
 
     }
 }

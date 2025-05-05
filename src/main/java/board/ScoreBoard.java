@@ -67,10 +67,14 @@ public class ScoreBoard {
         }
     }
 
-    public String summary() {
+    public String summaryOfActiveGames() {
         synchronized (activeGames) {
             return summaryBuilder.buildSummary(activeGames.entrySet().stream().sorted(Map.Entry.comparingByValue()).map(Map.Entry::getValue).toList());
         }
+    }
+
+    public String summaryOfFinishedGames() {
+        return summaryBuilder.buildSummary(finishedGames);
     }
 
     public void finishGameByTeams(String homeTeam, String awayTeam) {
