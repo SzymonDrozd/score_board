@@ -3,7 +3,8 @@ package board;
 import board.configuration.ScoreBoardConfiguration;
 import exception.DuplicateGameException;
 import exception.IncorrectGameValueException;
-import model.Game;
+import game.Game;
+import game.summary.configuration.SummaryBuilderConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = ScoreBoardConfiguration.class)
+@ContextConfiguration(classes = {ScoreBoardConfiguration.class, SummaryBuilderConfiguration.class})
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 class ScoreBoardTest {
 
@@ -120,12 +121,12 @@ class ScoreBoardTest {
         Runnable task1 = () -> {
             System.out.println("First task");
             assertEquals("""
-                Uruguay 6 - Italy 6
-                Spain 10 - Brazil 2
-                Mexico 0 - Canada 5
-                Argentina 3 - Australia 1
-                Germany 2 - France 2
-                """, scoreBoard.summary());
+                    Uruguay 6 - Italy 6
+                    Spain 10 - Brazil 2
+                    Mexico 0 - Canada 5
+                    Argentina 3 - Australia 1
+                    Germany 2 - France 2
+                    """, scoreBoard.summary());
         };
 
         Runnable task2 = () -> {
@@ -182,12 +183,12 @@ class ScoreBoardTest {
         Runnable task1 = () -> {
             System.out.println("First task");
             assertEquals("""
-                Uruguay 6 - Italy 6
-                Spain 10 - Brazil 2
-                Mexico 0 - Canada 5
-                Argentina 3 - Australia 1
-                Germany 2 - France 2
-                """, scoreBoard.summary());
+                    Uruguay 6 - Italy 6
+                    Spain 10 - Brazil 2
+                    Mexico 0 - Canada 5
+                    Argentina 3 - Australia 1
+                    Germany 2 - France 2
+                    """, scoreBoard.summary());
         };
 
         Runnable task2 = () -> {
@@ -197,11 +198,11 @@ class ScoreBoardTest {
             assertThrows(NoSuchElementException.class, () -> scoreBoard.findGameByTeams("Uruguay", "Italy"));
 
             assertEquals("""
-                Spain 10 - Brazil 2
-                Mexico 0 - Canada 5
-                Argentina 3 - Australia 1
-                Germany 2 - France 2
-                """, scoreBoard.summary());
+                    Spain 10 - Brazil 2
+                    Mexico 0 - Canada 5
+                    Argentina 3 - Australia 1
+                    Germany 2 - France 2
+                    """, scoreBoard.summary());
         };
 
         try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {

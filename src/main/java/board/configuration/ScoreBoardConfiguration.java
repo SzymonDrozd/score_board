@@ -1,6 +1,7 @@
 package board.configuration;
 
 import board.ScoreBoard;
+import game.summary.SummaryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class ScoreBoardConfiguration {
 
     @Bean
-    public ScoreBoard scoreBoard() {
-        return new ScoreBoard();
+    public ScoreBoard scoreBoard(SummaryBuilder defaultSummaryBuilder) {
+        return new ScoreBoard(defaultSummaryBuilder);
     }
 }

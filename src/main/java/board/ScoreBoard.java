@@ -2,17 +2,22 @@ package board;
 
 import exception.DuplicateGameException;
 import exception.IncorrectGameValueException;
-import model.Game;
+import game.Game;
+import game.summary.SummaryBuilder;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class ScoreBoard {
 
+    private final SummaryBuilder summaryBuilder;
+
     private final Map<String, Game> activeGames;
     private final List<Game> finishedGames;
 
-    public ScoreBoard() {
+    public ScoreBoard(SummaryBuilder summaryBuilder) {
+        this.summaryBuilder = summaryBuilder;
+
         activeGames = Collections.synchronizedMap(new HashMap<>());
         finishedGames = new ArrayList<>();
     }
@@ -64,18 +69,7 @@ public class ScoreBoard {
 
     public String summary() {
         synchronized (activeGames) {
-            StringBuffer stringBuffer = new StringBuffer();
-            activeGames.entrySet().stream().sorted(Map.Entry.comparingByValue()).forEachOrdered(game -> stringBuffer
-                    .append(game.getValue().getHomeTeam())
-                    .append(" ")
-                    .append(game.getValue().getHomeTeamScore())
-                    .append(" - ")
-                    .append(game.getValue().getAwayTeam())
-                    .append(" ")
-                    .append(game.getValue().getAwayTeamScore())
-                    .append("\n"));
-
-            return stringBuffer.toString();
+            return summaryBuilder.buildSummary(activeGames.entrySet().stream().sorted(Map.Entry.comparingByValue()).map(Map.Entry::getValue).toList());
         }
     }
 
