@@ -17,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DefaultSummaryBuilderTest {
 
     @Autowired
-    public SummaryBuilder defaultSummaryBuilder;
+    public SummaryBuilder<Game> defaultSummaryBuilder;
 
     @Test
     public void testDefaultSummaryBuilder() {
-        List<Game> testData = List.of(Game.gameBuilder().homeTeam("Test1").awayTeam("Test2").build(),
-                                        Game.gameBuilder().homeTeam("HomeTeam").awayTeam("AwayTeam").build(),
-                                        Game.gameBuilder().homeTeam("Hello").awayTeam("There").build(),
-                                        Game.gameBuilder().homeTeam("Test1").awayTeam("Test2").build());
+        List<Game> testData = List.of(new Game("Test1", "Test2"),
+                new Game("HomeTeam", "AwayTeam"),
+                new Game("Hello", "There"),
+                new Game("Test1", "Test2"));
 
         assertEquals("""
                 Test1 0 - Test2 0

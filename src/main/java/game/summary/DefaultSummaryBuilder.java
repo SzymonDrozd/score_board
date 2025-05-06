@@ -1,13 +1,13 @@
 package game.summary;
 
-import game.Game;
+import game.AbstractGame;
 
 import java.util.Collection;
 
-public class DefaultSummaryBuilder implements SummaryBuilder {
+public class DefaultSummaryBuilder implements SummaryBuilder<AbstractGame> {
 
     @Override
-    public String buildSummary(Collection<Game> games) {
+    public String buildSummary(Collection<AbstractGame> games) {
         StringBuffer stringBuffer = new StringBuffer();
         games.forEach(game -> stringBuffer
                 .append(game.getHomeTeam())

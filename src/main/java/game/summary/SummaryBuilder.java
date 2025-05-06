@@ -1,10 +1,10 @@
 package game.summary;
 
-import game.Game;
+import game.AbstractGame;
 
 import java.util.Collection;
 
-public interface SummaryBuilder {
+public interface SummaryBuilder<T extends AbstractGame> {
 
-    String buildSummary(Collection<Game> games);
+    String buildSummary(Collection<T> games);
 }
