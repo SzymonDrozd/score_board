@@ -1,7 +1,6 @@
 package board;
 
 import exception.DuplicateGameException;
-import exception.IncorrectGameValueException;
 import game.Game;
 import game.keygenerator.GameKeyGenerator;
 import game.summary.SummaryBuilder;
@@ -46,28 +45,8 @@ public class ScoreBoard {
 
     public void updateScoreByKey(String key, Integer newHomeTeamScore, Integer newAwayTeamScore) {
         Optional.ofNullable(findGameByKey(key))
-                .ifPresent(game -> updateScore(game, newHomeTeamScore, newAwayTeamScore));
+                .ifPresent(game -> game.updateScore(newHomeTeamScore, newAwayTeamScore));
 
-    }
-
-    private void updateScore(Game game, Integer newHomeTeamScore, Integer newAwayTeamScore) {
-        synchronized (game) {
-            Optional.ofNullable(newHomeTeamScore).ifPresent(value -> {
-                if(value < 0) {
-                    throw new IncorrectGameValueException("Home Team score value is out of range. Value: " + value);
-                }
-
-                game.setHomeTeamScore(value);
-            });
-
-            Optional.ofNullable(newAwayTeamScore).ifPresent(value -> {
-                if(value < 0) {
-                    throw new IncorrectGameValueException("Away Team score value is out of range. Value: " + value);
-                }
-
-                game.setAwayTeamScore(value);
-            });
-        }
     }
 
     public String summaryOfActiveGames() {
