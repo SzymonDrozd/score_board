@@ -4,6 +4,7 @@ import board.configuration.ScoreBoardConfiguration;
 import exception.DuplicateGameException;
 import exception.IncorrectGameValueException;
 import game.Game;
+import game.factory.GameFactoryConfiguration;
 import game.keygenerator.configuration.GameKeyGeneratorConfiguration;
 import game.summary.configuration.SummaryBuilderConfiguration;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ScoreBoardConfiguration.class, SummaryBuilderConfiguration.class, GameKeyGeneratorConfiguration.class})
+@ContextConfiguration(classes = {ScoreBoardConfiguration.class,
+        GameFactoryConfiguration.class,
+        SummaryBuilderConfiguration.class,
+        GameKeyGeneratorConfiguration.class})
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 class ScoreBoardTest {
 
     @Autowired
-    public ScoreBoard scoreBoard;
+    public ScoreBoard<Game> scoreBoard;
 
     @Test
     public void testStartGame() {
